@@ -1,6 +1,8 @@
 # 🎺 TrumpetPracticeHero
 
-TrumpetPracticeHero is an interactive, browser-based and desktop-native trumpet tutor designed to help brass musicians master pitch intonation, sight-reading, and piston valve fingerings. Using real-time, zero-lag monophonic pitch detection, it evaluates notes as you play and guides you through popular melodies.
+TrumpetPracticeHero is an interactive, browser-based and desktop-native trumpet tutor designed to help brass(or non brass!) musicians master pitch intonation, sight-reading, and piston valve fingerings. Using real-time, zero-lag monophonic pitch detection, it evaluates notes as you play and guides you through popular melodies.
+
+Releases: ([here](https://github.com/Arriators/TrumpetPracticeHero/releases))
 
 ---
 
@@ -8,6 +10,7 @@ TrumpetPracticeHero is an interactive, browser-based and desktop-native trumpet 
 
 * **🎼 High-Contrast Scrolling Staff**: Thicker, high-contrast staff lines (`2.0px`) with dynamic ledger lines, rests, and note flags (eighth/sixteenth notes).
 * **🎯 Zero-Lag Intonation Gauge**: Real-time autocorrelation pitch tracking optimized for brass frequencies (130Hz - 1200Hz) running at a throttled 22 FPS to prevent main-thread lag.
+* ** Gamified Approach**: Score and error tracker keep musician engaged, in turn causing the musician to practice more often
 * **🛡️ Late-Hit Latency Window**: A 200ms reaction buffer compensates for natural delay, ensuring late blows are still credited correctly instead of resulting in false misses.
 * **🍿 Popular Practice Library**: Built-in interactive lessons for:
   1. *Ode to Joy* (Beethoven)
@@ -15,8 +18,12 @@ TrumpetPracticeHero is an interactive, browser-based and desktop-native trumpet 
   3. *Twinkle Twinkle Little Star* (Traditional)
   4. *Jingle Bells* (James Pierpont)
   5. *Happy Birthday* (Traditional)
+* ** Learn Any Song**: Accepts any .midi / .mscx file upload, and allows you to select which track/ part you would like to learn.
+* ** Lots of Options**: Options to transpose piece according to other instruments, increase / decrease BPM, zoom in / out of score, or apply octave shift
 * **🎛️ Dynamic Intonation Tolerances**: Select relaxed (±45¢), normal (±35¢), or strict (±20¢) tuning tolerances.
+* ** Built In Tuner**: Chromatic tuner responds to microphone input in and out of the lesson for tuning puposes
 * **⚡ Smart Prompt Suppression**: Displays piston valves only when playing a wrong pitch; if you are playing the correct note name but are slightly out of tune, the fingering prompt is suppressed so you can focus on centering the pitch.
+* ** User Experience-Oriented**: Rewind + Restart Mechanics
 * **🕳️ Trailing Note History**: Expanded playhead layout with a shrunken clef panel keeps 3+ beats of completed notes visible on screen so you can track your accuracy history.
 
 ---
