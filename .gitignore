@@ -1,0 +1,15 @@
+# Dependency directories
+node_modules/
+
+# Production build outputs
+dist/
+dist-desktop/
+
+# OS-specific metadata files
+.DS_Store
+Thumbs.db
+*.log
+
+# Android platform and Capacitor configurations
+android/
+capacitor.config.json

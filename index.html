@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrumpetPracticeHero - Interactive Trumpet Tutor</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <h1>TrumpetPracticeHero</h1>
+        <p>Master your instrument with real-time pitch-tracking and visual valve fingerings</p>
+      </div>
+      <div id="connectionStatus" class="badge badge-green">MIC READY</div>
+    </header>
+
+    <!-- 1. DASHBOARD VIEW -->
+    <div id="dashboardView" class="view active">
+      <div class="dashboard-layout">
+        <!-- Main Column (Songs & Uploads) -->
+        <div class="dashboard-main" style="display: flex; flex-direction: column; gap: 2rem;">
+          <!-- Welcome & Logo Header -->
+          <div class="panel" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem;">
+            <img src="./app_logo.jpg" alt="Trumpet Practice Hero Logo" style="width: 80px; height: 80px; border-radius: 12px; border: 1px solid var(--border-color); object-fit: cover;">
+            <div>
+              <h2 style="margin: 0; font-family: var(--font-title); font-size: 1.6rem; color: var(--color-primary-light);">Welcome to Trumpet Practice Hero</h2>
+              <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">Your interactive guide to mastering pitch intonation and piston valve fingerings. Select a song below or drag in a custom score to get started!</p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Choose a Practice Song</h2>
+            <p class="subtitle text-muted" style="margin-bottom: 1rem;">Select one of our calibrated starter pieces to jump straight into practice.</p>
+            <div id="songsGrid" class="songs-grid">
+              <!-- Dynamically filled with preloaded songs -->
+            </div>
+          </div>
+
+          <div class="upload-grid">
+            <!-- File Drag & Drop Panel -->
+            <div class="panel dropzone" id="fileDropzone">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary-light); filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3)); margin-bottom: 8px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+              </svg>
+              <h3>Drag & Drop Sheet Music / Files</h3>
+              <p class="text-muted">Supports sheet music images (.png, .jpg), native MuseScore (.mscz), MusicXML (.musicxml, .xml), or MIDI (.mid, .midi)</p>
+              <button class="btn btn-secondary">Browse Local Files</button>
+            </div>
+            <input type="file" id="fileInput" accept="image/*,.mscz,.musicxml,.xml,.mid,.midi" style="display: none;">
+
+            <!-- MuseScore Download Guide -->
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: -0.5rem; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+              <strong>💡 MuseScore Guide:</strong>
+              <span>Open any sheet on MuseScore.com ➔ Click <em>Download</em> ➔ Select <strong>MSCZ</strong> or <strong>MusicXML</strong> (Free) ➔ Drop the file here!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Column (Chromatic Tuner Widget) -->
+        <div class="panel tuner-sidebar" style="display: flex; flex-direction: column; gap: 1rem;">
+          <h3>Chromatic Tuner</h3>
+          <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0.5rem;">Check your pitch and tune your instrument before starting your practice.</p>
+          
+          <div class="tuner-widget" style="width: 100%; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; justify-content: center; flex-grow: 1; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <button id="tunerToggleBtn" class="btn btn-secondary" style="width: 100%;">
+              Enable Live Tuner
+            </button>
+            <div id="tunerWidgetContent" style="display: none; flex-direction: column; align-items: center; gap: 1.25rem; width: 100%;">
+              <div class="tuner-note-display" id="tunerWidgetNote">-</div>
+              <div class="tuner-freq-display text-muted" id="tunerWidgetFreq" style="font-family: var(--font-mono); font-size: 1rem;">0.0 Hz</div>
+              
+              <!-- Horizontal Tuning Deviation Slider Bar -->
+              <div class="tuner-bar-wrapper">
+                <div class="tuner-bar-marker center"></div>
+                <div class="tuner-bar-indicator" id="tunerWidgetIndicator"></div>
+              </div>
+              <div class="tuner-cents-label text-muted" id="tunerWidgetCents" style="font-size: 0.85rem; font-weight: 500;">0 cents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SETUP VIEW -->
+    <div id="setupView" class="view">
+      <button class="btn btn-secondary" id="backToDashBtn" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Back to Dashboard
+      </button>
+      
+      <div class="setup-layout">
+        <!-- Instrument Transposition Picker -->
+        <div class="panel setup-card">
+          <h3>1. Choose Your Instrument Key</h3>
+          <p class="text-muted">Trumpets are transposing instruments. Selecting the correct key aligns the sheet music notation with your instrument's fingerings.</p>
+          <div class="instrument-grid">
+            <div class="instrument-option active" data-key="Bb">
+              <h4>Bb Trumpet</h4>
+              <p>Standard Trumpet, Cornet, Flugelhorn</p>
+            </div>
+            <div class="instrument-option" data-key="C">
+              <h4>Concert Pitch (C)</h4>
+              <p>Piano, Flute, Oboe, Violin</p>
+            </div>
+            <div class="instrument-option" data-key="Eb">
+              <h4>Eb Alto Sax</h4>
+              <p>Alto / Baritone Saxophone</p>
+            </div>
+            <div class="instrument-option" data-key="F">
+              <h4>F French Horn</h4>
+              <p>French Horn, English Horn</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Parameters & Backing Track -->
+        <div class="panel setup-card">
+          <h3>2. Configure Speed & Backing Track</h3>
+          
+          <div class="form-group">
+            <label>Practice Tempo (BPM)</label>
+            <div class="tempo-controls">
+              <input type="range" id="tempoSlider" min="40" max="180" value="100">
+              <span class="tempo-val" id="tempoValue">100 BPM</span>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Score Zoom Level (Visual Distance)</label>
+            <div class="tempo-controls">
+              <input type="range" id="zoomSlider" min="40" max="120" value="60">
+              <span class="tempo-val" id="zoomValue">Medium (60px)</span>
+            </div>
+          </div>
+
+          <!-- Octave Shift Toggle -->
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Octave Shift</label>
+            <div style="display: flex; gap: 1.5rem; margin-top: 0.25rem;">
+              <label style="display: inline-flex; align-items: center; gap: 0.5rem; text-transform: none; font-weight: normal; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="octaveShift" value="0" checked style="accent-color: var(--color-primary-light); width: 16px; height: 16px;"> Standard Octave
+              </label>
+              <label style="display: inline-flex; align-items: center; gap: 0.5rem; text-transform: none; font-weight: normal; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="octaveShift" value="-12" style="accent-color: var(--color-primary-light); width: 16px; height: 16px;"> Shift Octave Down (-12¢ / 8vb)
+              </label>
+            </div>
+          </div>
+
+          <!-- Tuning Tolerance Select -->
+          <div class="form-group" style="margin-top: 1rem;">
+            <label for="toleranceSelect">Tuning Tolerance (Intonation Accuracy)</label>
+            <select id="toleranceSelect" class="input-glow" style="width: 100%; background: var(--bg-card); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px; cursor: pointer; outline: none; font-size: 0.95rem;">
+              <option value="45">Easy / Relaxed (±45 cents) - Best for beginners</option>
+              <option value="35" selected>Normal / Balanced (±35 cents)</option>
+              <option value="20">Strict / Advanced (±20 cents) - For intonation practice</option>
+            </select>
+          </div>
+
+
+
+          <div class="mic-calibration">
+            <div class="mic-status-label">
+              <span>Microphone Calibration:</span>
+              <span id="micHzLabel">Silent</span>
+            </div>
+            <div class="mic-meter-container">
+              <div class="mic-meter-fill" id="micMeterFill"></div>
+            </div>
+            <!-- Test Mode Helper -->
+            <button id="testAudioBtn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 1rem; align-self: flex-start; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <svg id="testAudioIcon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              <span>Play Test Sine Wave</span>
+            </button>
+          </div>
+
+          <button id="startGameBtn" class="btn" style="margin-top: 1rem; font-size: 1.1rem; width: 100%; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center;">
+            Start Playing Game
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. GAMEPLAY VIEW -->
+    <div id="gameView" class="view">
+      <div class="panel game-controls-header">
+        <div class="game-title-info">
+          <h2 id="gameSongTitle">Ode to Joy</h2>
+          <p id="gameSongComposer">Ludwig van Beethoven</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <div style="text-align: right;">
+            <div class="text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Score</div>
+            <div id="gameScore" class="hud-val" style="color: var(--color-primary-light);">0000</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Streak</div>
+            <div id="gameCombo" class="hud-val" style="color: var(--color-correct);">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrolling Music Staff -->
+      <div class="canvas-wrapper" style="position: relative;">
+        <canvas id="gameCanvas"></canvas>
+        <!-- Visual Game Countdown Overlay -->
+        <div id="gameCountdownOverlay" class="countdown-overlay" style="display: none;">
+          <div class="countdown-number" id="countdownNumber">3</div>
+        </div>
+      </div>
+
+      <!-- Live HUD and Tuner / Valve graphics -->
+      <div class="game-hud-layout">
+        <!-- Pitch Tuner Panel -->
+        <div class="panel hud-panel">
+          <h3>Pitch Intonation</h3>
+          <div class="tuner-container">
+            <div class="tuner-arc"></div>
+            <div class="tuner-needle" id="tunerNeedle"></div>
+            <div class="tuner-center-pin"></div>
+          </div>
+          <div class="note-bubble" id="tunerNote">-</div>
+          <div class="text-muted" style="font-size: 0.8rem;" id="tunerDeviation">0 cents</div>
+        </div>
+
+        <!-- Trumpet Piston Valves Prompt UI -->
+        <div class="panel hud-panel">
+          <h3>Fingering Valves</h3>
+          <div class="fingerings-prompt-panel" id="fingeringsPromptPanel">
+            <div class="fingering-container" id="fingeringContainer">
+              <span class="fingering-hint-label">Fingerings Help!</span>
+              <div id="valveSvgContainer" style="width: 100%; height: 75px;">
+                <!-- SVG valves inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="panel hud-panel" style="gap: 1rem; justify-content: space-around;">
+          <h3>Control Panel</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%;">
+            <button id="togglePlayBtn" class="btn" style="grid-column: span 2;">Pause Practice</button>
+            <button id="rewindBtn" class="btn btn-secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 19 2 12 11 5 11 19"></polygon><polygon points="22 19 13 12 22 5 22 19"></polygon></svg>
+              Rewind ⏪
+            </button>
+            <button id="restartGameBtn" class="btn btn-secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">
+              Restart 🔄
+            </button>
+            <button id="exitGameBtn" class="btn btn-danger">Exit practice</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. FEEDBACK / AI ADVISOR VIEW -->
+    <div id="feedbackView" class="view">
+      <div class="feedback-grid">
+        <!-- Grade & Scoring Panel -->
+        <div class="panel grade-card">
+          <h2>AI Evaluation</h2>
+          <div class="grade-circle" id="feedbackGrade">A</div>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
+            <div style="display: flex; justify-content: space-between;">
+              <span class="text-muted">Accuracy:</span>
+              <strong id="feedbackAccuracy">0%</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span class="text-muted">Avg Pitch Cent Error:</span>
+              <strong id="feedbackDev">0¢</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span class="text-muted">Notes Hit:</span>
+              <strong id="feedbackHits">0</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; width: 100%;">
+            <button id="replayBtn" class="btn" style="flex-grow: 1;">Practice Again</button>
+            <button id="exitFeedbackBtn" class="btn btn-secondary" style="flex-grow: 1;">Close</button>
+          </div>
+        </div>
+
+        <!-- AI Coach remarks & Charts -->
+        <div class="feedback-details">
+          <div class="panel ai-remark-box">
+            <h3>
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary-light); vertical-align: middle; margin-right: 6px; display: inline-block;">
+                <rect x="3" y="11" width="18" height="10" rx="2" />
+                <circle cx="12" cy="5" r="2" />
+                <path d="M12 7v4M8 16h.01M16 16h.01M9 11V9a3 3 0 0 1 6 0v2" />
+              </svg>AI Practice Coach Feedback
+            </h3>
+            <p id="aiEvaluationText" style="margin-bottom: 1rem; font-size: 1rem;"></p>
+            <ul id="aiAdviceList" class="ai-advice-list">
+              <!-- Filled dynamically with items -->
+            </ul>
+          </div>
+
+          <div class="panel charts-wrapper">
+            <h3>Practice Analytics</h3>
+            <canvas id="analyticsCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. OMR SCANNER OVERLAY -->
+    <div id="scannerOverlay" class="scanner-overlay">
+      <div class="scanner-content">
+        <h2 style="font-family: var(--font-title); font-size: 1.8rem; background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Scanning Sheet Music Image...
+        </h2>
+        <p class="text-muted">Using OMR vision engine to identify music staves, clefs, and note pitches.</p>
+        <div class="sheet-image-container">
+          <img id="scannerImage" class="sheet-image-preview" src="" alt="Sheet Music Scan">
+          <div class="laser-bar"></div>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+          <div class="badge badge-blue" style="animation: pulse 1s infinite;">EXTRACTING NOTES</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. PART SELECTOR MODAL -->
+    <div id="partSelectorOverlay" class="scanner-overlay">
+      <div class="panel" style="width: 90%; max-width: 450px; display: flex; flex-direction: column; gap: 1.5rem; text-align: left; background: var(--bg-secondary); border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
+        <h3 style="font-family: var(--font-title); font-size: 1.4rem; color: var(--color-primary-light);">Select Practice Track</h3>
+        <p class="text-muted" style="font-size: 0.85rem; margin-top: -0.8rem;">This file contains multiple parts. Select which part you would like to practice:</p>
+        <div id="partsListContainer" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem;">
+          <!-- Populated dynamically with parts -->
+        </div>
+        <button id="cancelPartSelectBtn" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem;">Cancel Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main script bundle -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
