@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "electron:start": "cross-env ELECTRON_DEV=true electron .",
     "electron:build": "vite build && electron .",
-    "electron:pack": "vite build && electron-packager . TrumpetPracticeHero --platform=win32 --arch=x64 --out=dist-desktop --overwrite --asar"
+    "electron:pack": "vite build && electron-packager . TrumpetPracticeHero --platform=win32 --arch=x64 --out=dist-desktop --overwrite --asar",
+    "check-ai": "node scripts/check-ai.js"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
